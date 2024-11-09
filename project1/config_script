@@ -1,0 +1,59 @@
+ #!/bin/bash
+
+
+ # Default values
+setup=0
+symlink=0
+
+# Function to display usage
+usage() {
+    echo "Usage: $0 [-s] [-x] [-p]"
+    echo "  -s   Execute the symlink creation script"
+    echo "  -x   Execute both the setup and symlink scripts"
+    echo "  -p   Execute the package installer script"
+    exit 1
+}
+
+# Parse command-line options
+while getopts ":sxp" opt; do
+    case $opt in
+        s)
+            symlink=1
+            ;;
+        x)
+            symlink=1
+            setup=1
+            ;;
+        p)
+            setup=1
+            ;;
+        ?)
+            echo "Invalid option: -$OPTARG"
+            usage
+            ;;
+    esac
+done
+
+# Run package installer if setup is enabled
+if [[ $setup -eq 1 ]]; then
+    if [[ -x ./package_installer ]]; then
+        echo "Running package installer script..."
+        ./package_installer
+    else
+        echo "Error: package_installer script not found or not executable"
+        exit 1
+    fi
+fi
+
+# Run symlink creation if symlink is enabled
+if [[ $symlink -eq 1 ]]; then
+    if [[ -x ./config_symlink ]]; then
+        echo "Running symlink creation script..."
+        ./config_symlink
+    else
+        echo "Error: config_symlink script not found or not executable"
+        exit 1
+    fi
+fi
+
+echo "Configuration setup complete"
